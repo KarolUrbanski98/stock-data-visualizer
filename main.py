@@ -1,25 +1,41 @@
 import json
+import os
+from selenium.webdriver.common.by import By
+from browserManager import BrowserManager
 
-from selenium import webdriver
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
 
-with open('config.json', 'r') as config_file:
-    config_data = json.load(config_file)
+browser_manager = BrowserManager()
+driver = browser_manager.get_driver()
+driver.get("https://nbp.pl/statystyka-i-sprawozdawczosc/kursy/tabela-a/")
 
-# default browser - Firefox
-preferred_browser = config_data.get("preferred_browser", "Firefox")
+rows = driver.find_elements(By.XPATH, "//tbody/tr")
 
-if preferred_browser == "Firefox":
-    service_obj = FirefoxService(executable_path=GeckoDriverManager().install(), log_output="logs/geckodriver.log")
-    driver = webdriver.Firefox(service=service_obj)
-elif preferred_browser == "Chrome":
-    service_obj = ChromeService(executable_path=ChromeDriverManager().install(), log_output="logs/chromedriver.log")
-    driver = webdriver.Chrome(service=service_obj)
-else:
-    raise Exception("Unknown browser: " + preferred_browser)
+for row in rows:
+    currency = row.find_element(By.XPATH, "./td[2]")
 
-driver.get("https://rahulshettyacademy.com/angularpractice/")
+    if currency.text == "1 USD":
+        value = row.find_element(By.XPATH, "./td[3]")
+        usd_string = value.text
+        usd = float(usd_string.replace(",", "."))
+        print(usd)
+
+    if currency.text == "1 GBP":
+        value = row.find_element(By.XPATH, "./td[3]")
+        gbp_string = value.text
+        gbp = float(gbp_string.replace(",", "."))
+        print(gbp)
+
+    if currency.text == "1 EUR":
+        value = row.find_element(By.XPATH, "./td[3]")
+        eur_string = value.text
+        eur = float(eur_string.replace(",", "."))
+        print(eur)
+
+    if currency.text == "1 CHF":
+        value = row.find_element(By.XPATH, "./td[3]")
+        chf_string = value.text
+        chf = float(chf_string.replace(",", "."))
+        print(chf)
+
+driver.close()
 driver.quit()
