@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from browserManager import BrowserManager
