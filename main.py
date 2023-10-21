@@ -1,23 +1,13 @@
 import json
-import os
 from datetime import datetime
-
 from selenium.webdriver.common.by import By
 from browserManager import BrowserManager
-
-file_path = "historical_data.json"
-if os.path.exists(file_path):
-    with open(file_path, "r") as json_file:
-        historical_data = json.load(json_file)
-else:
-    historical_data = {
-        "USD": [],
-        "GBP": [],
-        "EUR": [],
-        "CHF": []
-    }
+from dataManager import DataManager
 
 current_date = datetime.now().strftime("%d-%m-%y")
+
+data_manager = DataManager()
+historical_data = data_manager.load_or_initialize_data()
 
 browser_manager = BrowserManager()
 driver = browser_manager.get_driver()
@@ -52,8 +42,7 @@ for row in rows:
         chf = float(chf_string.replace(",", "."))
         historical_data["CHF"].append({"date": current_date, "value": chf})
 
-with open(file_path, "w") as json_file:
-    json.dump(historical_data, json_file)
+data_manager.save_data(historical_data)
 
 driver.close()
 driver.quit()
